@@ -1,0 +1,224 @@
+/* ================================================================
+   R.I.E. Smart Finance — prestamos.css
+   Módulo Préstamos y Cobros
+   ================================================================ */
+
+/* ── CARD AMBER ─────────────────────────────────────────── */
+.card-amber      { background: #B45309; color: white; }
+.card-amber .card-icon { font-size: 28px; }
+
+/* ── PREVIEW TABLE ──────────────────────────────────────── */
+.preview-table {
+  margin-top: 20px;
+  background: #F4F6F9;
+  border: 1.5px solid #C9A84C;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.preview-table h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0A2342;
+  margin-bottom: 10px;
+}
+
+.preview-stats {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.preview-stats span {
+  font-size: 13px;
+  color: #555;
+}
+
+.preview-stats strong {
+  color: #0A2342;
+  font-weight: 700;
+}
+
+/* ── SCROLLABLE TABLE ────────────────────────────────────── */
+.table-scroll {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+/* ── SELECT SMALL ────────────────────────────────────────── */
+.select-sm {
+  padding: 6px 12px;
+  border: 1.5px solid #dde3ec;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #2D2D2D;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* ── BTN SECONDARY ───────────────────────────────────────── */
+.btn-secondary {
+  flex: 1;
+  padding: 12px;
+  background: #fff;
+  color: #0A2342;
+  border: 2px solid #0A2342;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #0A2342;
+  color: #C9A84C;
+}
+
+/* ── BADGES PRESTAMO ─────────────────────────────────────── */
+.badge-activo    { background: #E8F5EE; color: #1A6B3A; }
+.badge-mora      { background: #FFE8E8; color: #8B1A1A; }
+.badge-cancelado { background: #F0F0F0; color: #555555; }
+.badge-pendiente { background: #D6E8F7; color: #0A2342; }
+.badge-pagada    { background: #E8F5EE; color: #1A6B3A; }
+.badge-vencida   { background: #FFE8E8; color: #8B1A1A; }
+
+/* ── ALERT BANNER ────────────────────────────────────────── */
+.alert-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: #FFF3CD;
+  border: 1.5px solid #B45309;
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin: 16px 28px 0;
+  font-size: 13px;
+  color: #7A3C00;
+}
+
+.alert-banner span { font-size: 20px; }
+
+/* ── PRESTAMO INFO BOX ───────────────────────────────────── */
+.prestamo-info-box {
+  margin-top: 16px;
+  background: #F4F6F9;
+  border-radius: 10px;
+  border-left: 4px solid #C9A84C;
+  padding: 16px 20px;
+}
+
+.pinfo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.pinfo-grid > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.pinfo-grid span {
+  font-size: 11px;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+
+.pinfo-grid strong {
+  font-size: 14px;
+  color: #0A2342;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+/* ── MORA CELL ───────────────────────────────────────────── */
+.mora-value { color: #8B1A1A; font-weight: 700; }
+.mora-zero  { color: #aaa; }
+
+/* ── MODAL ───────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,35,66,0.55);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+  padding: 32px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.modal-box h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0A2342;
+  margin-bottom: 12px;
+}
+
+.modal-info {
+  background: #D6E8F7;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #0A2342;
+  line-height: 1.6;
+}
+
+.input-readonly {
+  background: #f4f6f9 !important;
+  color: #555 !important;
+  cursor: default !important;
+}
+
+.input-readonly.highlight {
+  background: #E8F5EE !important;
+  color: #1A6B3A !important;
+  font-weight: 700 !important;
+  font-size: 16px !important;
+}
+
+/* ── BTN PAGAR ───────────────────────────────────────────── */
+.btn-pagar {
+  padding: 5px 12px;
+  background: #1A6B3A;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-pagar:hover { background: #145c30; }
+.btn-pagar:disabled { background: #ccc; cursor: default; }
+
+/* ── BTN VER CUOTAS ──────────────────────────────────────── */
+.btn-ver {
+  padding: 5px 10px;
+  background: #0A2342;
+  color: #C9A84C;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-ver:hover { background: #1a3a5c; }
+
+/* ── TOGGLE FORM ─────────────────────────────────────────── */
+#form-prestamo { transition: all 0.3s; }
