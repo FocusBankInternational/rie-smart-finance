@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>R.I.E. Smart Finance – Cobros</title>
+  <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body class="app-page">
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo small">FBI</div>
+      <span>R.I.E.</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
+      <li><a href="libro_diario.html">📒 <span>Libro Diario</span></a></li>
+      <li><a href="prestamos.html">🏦 <span>Préstamos</span></a></li>
+      <li class="active"><a href="cobros.html">💳 <span>Cobros</span></a></li>
+      <li><a href="reportes.html">📄 <span>Reportes</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <h2>💳 Módulo de Cobros</h2>
+      <div class="top-bar-right">
+        <div class="lang-bar small">
+          <button class="lang-btn active" onclick="setLang('es')">ES</button>
+          <button class="lang-btn" onclick="setLang('en')">EN</button>
+          <button class="lang-btn" onclick="setLang('zh')">中文</button>
+        </div>
+        <span class="user-name" id="user-display">Usuario</span>
+      </div>
+    </header>
+
+    <!-- ALERTAS DE VENCIMIENTO -->
+    <div id="alertas-box" style="display:none">
+      <div class="alert-banner">
+        <span>⚠️</span>
+        <div id="alertas-content"></div>
+      </div>
+    </div>
+
+    <!-- RESUMEN COBROS -->
+    <section class="cards-grid">
+      <div class="card card-red">
+        <div class="card-icon">🔴</div>
+        <div class="card-info"><span>Cuotas Vencidas</span><strong id="cob-vencidas">0</strong></div>
+      </div>
+      <div class="card card-amber">
+        <div class="card-icon">🟡</div>
+        <div class="card-info"><span>Vencen esta semana</span><strong id="cob-semana">0</strong></div>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">✅</div>
+        <div class="card-info"><span>Pagadas este mes</span><strong id="cob-pagadas">0</strong></div>
+      </div>
+      <div class="card card-navy">
+        <div class="card-icon">💰</div>
+        <div class="card-info"><span>Monto Vencido</span><strong id="cob-monto-vencido">$0.00</strong></div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-icon">📅</div>
+        <div class="card-info"><span>Por Cobrar Total</span><strong id="cob-por-cobrar">$0.00</strong></div>
+      </div>
+      <div class="card card-green-light">
+        <div class="card-icon">🏆</div>
+        <div class="card-info"><span>Cobrado este mes</span><strong id="cob-cobrado-mes">$0.00</strong></div>
+      </div>
+    </section>
+
+    <!-- SELECTOR DE PRÉSTAMO -->
+    <section class="section-box">
+      <div class="section-header">
+        <h3>📂 Seleccionar Préstamo</h3>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label>Préstamo</label>
+          <select id="sel-prestamo" onchange="cargarCuotas()">
+            <option value="">— Seleccione un préstamo —</option>
+          </select>
+        </div>
+        <div class="form-group align-end">
+          <button class="btn-sm" onclick="exportarCartera()">📥 Exportar Cartera CSV</button>
+        </div>
+      </div>
+
+      <!-- INFO DEL PRÉSTAMO SELECCIONADO -->
+      <div id="info-prestamo" style="display:none" class="prestamo-info-box">
+        <div class="pinfo-grid">
+          <div><span>Beneficiario</span><strong id="pi-beneficiario">—</strong></div>
+          <div><span>Monto Original</span><strong id="pi-monto">—</strong></div>
+          <div><span>Tasa Anual</span><strong id="pi-tasa">—</strong></div>
+          <div><span>Plazo</span><strong id="pi-plazo">—</strong></div>
+          <div><span>Sistema</span><strong id="pi-sistema">—</strong></div>
+          <div><span>Estado</span><strong id="pi-estado">—</strong></div>
+          <div><span>Cuotas Pagadas</span><strong id="pi-pagadas">—</strong></div>
+          <div><span>Saldo Pendiente</span><strong id="pi-saldo">—</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLA DE CUOTAS -->
+    <section class="section-box" id="sec-cuotas" style="display:none">
+      <div class="section-header">
+        <h3 id="titulo-cuotas">Tabla de Cuotas</h3>
+        <div style="display:flex;gap:8px">
+          <select id="filtro-cuotas" onchange="filtrarCuotas()" class="select-sm">
+            <option value="todas">Todas las cuotas</option>
+            <option value="pendientes">Pendientes</option>
+            <option value="vencidas">Vencidas</option>
+            <option value="pagadas">Pagadas</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Vencimiento</th>
+              <th>Capital</th>
+              <th>Interés</th>
+              <th>Cuota Total</th>
+              <th>Mora</th>
+              <th>Total + Mora</th>
+              <th>Estado</th>
+              <th>Fecha Pago</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-cuotas-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- MODAL REGISTRAR PAGO -->
+    <div id="modal-pago" class="modal-overlay" style="display:none">
+      <div class="modal-box">
+        <h3>💵 Registrar Pago de Cuota</h3>
+        <div id="modal-info" class="modal-info"></div>
+        <div class="form-group" style="margin-top:16px">
+          <label>Fecha de Pago</label>
+          <input type="date" id="modal-fecha-pago"/>
+        </div>
+        <div class="form-group">
+          <label>Mora Calculada</label>
+          <input type="text" id="modal-mora-display" readonly class="input-readonly"/>
+        </div>
+        <div class="form-group">
+          <label>Total a Cobrar (Cuota + Mora)</label>
+          <input type="text" id="modal-total-display" readonly class="input-readonly highlight"/>
+        </div>
+        <div id="modal-error" class="alert alert-error" style="display:none"></div>
+        <div class="form-row" style="margin-top:16px;gap:12px">
+          <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
+          <button class="btn-primary" onclick="confirmarPago()">✅ Confirmar Pago</button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="app-footer">Focus Bank International — R.I.E. Smart Finance MVP 1.0 | Módulo Cobros</footer>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/cobros.js"></script>
+</body>
+</html>

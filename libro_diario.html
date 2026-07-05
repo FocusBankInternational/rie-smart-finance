@@ -3,28 +3,24 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R.I.E. Smart Finance &ndash; Libro Diario</title>
+  <title>R.I.E. Smart Finance – Libro Diario</title>
   <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body class="app-page">
   <nav class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo small">FBI</div>
-      <span>R.I.E.</span>
-    </div>
+    <div class="sidebar-brand"><div class="brand-logo small">RIE</div><span>R.I.E.</span></div>
     <ul class="nav-links">
-      <li><a href="dashboard.html">&#128202; <span data-i18n="nav_dashboard">Dashboard</span></a></li>
-      <li class="active"><a href="libro_diario.html">&#128218; <span data-i18n="nav_diario">Libro Diario</span></a></li>
-      <li><a href="reportes.html">&#128196; <span data-i18n="nav_reportes">Reportes</span></a></li>
+      <li><a href="dashboard.html">&#128202; Dashboard</a></li>
+      <li class="active"><a href="libro_diario.html">&#128218; Libro Diario</a></li>
+      <li><a href="prestamos.html">&#127974; Pr&eacute;stamos</a></li>
+      <li><a href="cobros.html">&#128179; Cobros</a></li>
+      <li><a href="reportes.html">&#128196; Reportes</a></li>
     </ul>
-    <div class="sidebar-footer">
-      <button onclick="logout()" class="btn-logout" data-i18n="logout">Cerrar Sesi&oacute;n</button>
-    </div>
+    <div class="sidebar-footer"><button onclick="logout()" class="btn-logout">Cerrar Sesi&oacute;n</button></div>
   </nav>
-
   <main class="main-content">
     <header class="top-bar">
-      <h2 data-i18n="nav_diario">Libro Diario</h2>
+      <h2>&#128218; Libro Diario</h2>
       <div class="top-bar-right">
         <div class="lang-bar small">
           <button class="lang-btn active" onclick="setLang('es')">ES</button>
@@ -34,73 +30,40 @@
         <span class="user-name" id="user-display">Usuario</span>
       </div>
     </header>
-
     <section class="section-box">
-      <h3 data-i18n="nuevo_movimiento">Nuevo Movimiento</h3>
-      <form id="form-movimiento" onsubmit="guardarMovimiento(event)">
+      <h3>&#10133; Nuevo Movimiento</h3>
+      <form onsubmit="guardarMovimiento(event)">
         <div class="form-row">
-          <div class="form-group">
-            <label data-i18n="col_fecha">Fecha</label>
-            <input type="date" id="m-fecha" required/>
-          </div>
-          <div class="form-group">
-            <label data-i18n="col_tipo">Tipo</label>
+          <div class="form-group"><label>Fecha</label><input type="date" id="m-fecha" required/></div>
+          <div class="form-group"><label>Tipo</label>
             <select id="m-tipo">
-              <option value="ingreso" data-i18n="ingreso">Ingreso</option>
-              <option value="gasto" data-i18n="gasto">Gasto</option>
+              <option value="ingreso">Ingreso</option>
+              <option value="gasto">Gasto</option>
             </select>
           </div>
-          <div class="form-group">
-            <label data-i18n="col_valor">Valor</label>
-            <input type="number" id="m-valor" min="0.01" step="0.01" required placeholder="0.00"/>
-          </div>
-          <div class="form-group">
-            <label data-i18n="moneda">Moneda</label>
+          <div class="form-group"><label>Valor</label><input type="number" id="m-valor" min="0.01" step="0.01" required placeholder="0.00"/></div>
+          <div class="form-group"><label>Moneda</label>
             <select id="m-moneda">
-              <option value="USD">USD</option>
-              <option value="EUR">EUR</option>
-              <option value="GBP">GBP</option>
-              <option value="CNY">CNY</option>
+              <option value="USD">USD</option><option value="EUR">EUR</option>
+              <option value="GBP">GBP</option><option value="CNY">CNY</option>
             </select>
           </div>
         </div>
-        <div class="form-group">
-          <label data-i18n="col_concepto">Concepto</label>
-          <input type="text" id="m-concepto" required placeholder="Descripci&oacute;n del movimiento"/>
-        </div>
-        <div class="form-group">
-          <label data-i18n="observaciones">Observaciones</label>
-          <input type="text" id="m-obs" placeholder="Opcional"/>
-        </div>
+        <div class="form-group"><label>Concepto</label><input type="text" id="m-concepto" required placeholder="Descripci&oacute;n del movimiento"/></div>
+        <div class="form-group"><label>Observaciones</label><input type="text" id="m-obs" placeholder="Opcional"/></div>
         <div id="mov-error" class="alert alert-error" style="display:none"></div>
-        <button type="submit" class="btn-primary" data-i18n="guardar">Guardar Movimiento</button>
+        <button type="submit" class="btn-primary">&#128190; Guardar Movimiento</button>
       </form>
     </section>
-
     <section class="section-box">
-      <div class="section-header">
-        <h3 data-i18n="historial">Historial de Movimientos</h3>
-      </div>
+      <div class="section-header"><h3>&#128203; Historial de Movimientos</h3></div>
       <table class="data-table">
-        <thead>
-          <tr>
-            <th data-i18n="col_fecha">Fecha</th>
-            <th data-i18n="col_concepto">Concepto</th>
-            <th data-i18n="col_tipo">Tipo</th>
-            <th data-i18n="col_valor">Valor</th>
-            <th data-i18n="moneda">Moneda</th>
-            <th data-i18n="acciones">Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-diario-body">
-          <tr><td colspan="6" class="empty-row" data-i18n="sin_movimientos">Sin movimientos registrados</td></tr>
-        </tbody>
+        <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Valor</th><th>Moneda</th><th>Acciones</th></tr></thead>
+        <tbody id="tabla-diario-body"><tr><td colspan="6" class="empty-row">Sin movimientos registrados</td></tr></tbody>
       </table>
     </section>
-
     <footer class="app-footer">Focus Bank International &mdash; R.I.E. Smart Finance MVP 1.0</footer>
   </main>
-
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script src="js/libro_diario.js"></script>

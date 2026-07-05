@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>R.I.E. Smart Finance – Login</title>
   <link rel="stylesheet" href="css/style.css"/>
@@ -9,33 +9,30 @@
 <body class="auth-page">
   <div class="auth-card">
     <div class="brand">
-      <div class="brand-logo">FBI</div>
+      <div class="brand-logo">RIE</div>
       <h1>R.I.E. Smart Finance</h1>
       <p class="brand-sub">Riqueza &bull; Inteligencia &bull; Energ&iacute;a</p>
+      <p class="brand-sub2">Focus Bank International</p>
     </div>
-
     <div class="lang-bar">
       <button class="lang-btn active" onclick="setLang('es')">ES</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
       <button class="lang-btn" onclick="setLang('zh')">&#20013;&#25991;</button>
     </div>
-
-    <form id="login-form" onsubmit="handleLogin(event)">
+    <form onsubmit="handleLogin(event)">
       <div class="form-group">
         <label data-i18n="email">Correo electr&oacute;nico</label>
         <input type="email" id="correo" required placeholder="usuario@email.com"/>
       </div>
       <div class="form-group">
         <label data-i18n="password">Contrase&ntilde;a</label>
-        <input type="password" id="password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"/>
+        <input type="password" id="password" required placeholder="••••••••"/>
       </div>
       <div id="login-error" class="alert alert-error" style="display:none"></div>
       <button type="submit" class="btn-primary" data-i18n="login_btn">Iniciar Sesi&oacute;n</button>
     </form>
-
     <p class="auth-link">
-      <span data-i18n="no_account">&iquest;No tienes cuenta?</span>
-      <a href="register.html" data-i18n="register_link">Reg&iacute;strate aqu&iacute;</a>
+      &iquest;No tienes cuenta? <a href="register.html">Reg&iacute;strate aqu&iacute;</a>
     </p>
     <p class="powered">Powered by Focus Bank International</p>
   </div>

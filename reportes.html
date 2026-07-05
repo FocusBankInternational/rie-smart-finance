@@ -3,28 +3,24 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R.I.E. Smart Finance &ndash; Reportes</title>
+  <title>R.I.E. Smart Finance – Reportes</title>
   <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body class="app-page">
   <nav class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo small">FBI</div>
-      <span>R.I.E.</span>
-    </div>
+    <div class="sidebar-brand"><div class="brand-logo small">RIE</div><span>R.I.E.</span></div>
     <ul class="nav-links">
-      <li><a href="dashboard.html">&#128202; <span data-i18n="nav_dashboard">Dashboard</span></a></li>
-      <li><a href="libro_diario.html">&#128218; <span data-i18n="nav_diario">Libro Diario</span></a></li>
-      <li class="active"><a href="reportes.html">&#128196; <span data-i18n="nav_reportes">Reportes</span></a></li>
+      <li><a href="dashboard.html">&#128202; Dashboard</a></li>
+      <li><a href="libro_diario.html">&#128218; Libro Diario</a></li>
+      <li><a href="prestamos.html">&#127974; Pr&eacute;stamos</a></li>
+      <li><a href="cobros.html">&#128179; Cobros</a></li>
+      <li class="active"><a href="reportes.html">&#128196; Reportes</a></li>
     </ul>
-    <div class="sidebar-footer">
-      <button onclick="logout()" class="btn-logout" data-i18n="logout">Cerrar Sesi&oacute;n</button>
-    </div>
+    <div class="sidebar-footer"><button onclick="logout()" class="btn-logout">Cerrar Sesi&oacute;n</button></div>
   </nav>
-
   <main class="main-content">
     <header class="top-bar">
-      <h2 data-i18n="nav_reportes">Reportes</h2>
+      <h2>&#128196; Reportes</h2>
       <div class="top-bar-right">
         <div class="lang-bar small">
           <button class="lang-btn active" onclick="setLang('es')">ES</button>
@@ -34,12 +30,10 @@
         <span class="user-name" id="user-display">Usuario</span>
       </div>
     </header>
-
     <section class="section-box">
-      <h3 data-i18n="generar_reporte">Generar Reporte</h3>
+      <h3>&#128196; Generar Reporte</h3>
       <div class="form-row">
-        <div class="form-group">
-          <label data-i18n="tipo_reporte">Tipo de Reporte</label>
+        <div class="form-group"><label>Tipo de Reporte</label>
           <select id="tipo-reporte" onchange="actualizarFiltros()">
             <option value="diario">Diario</option>
             <option value="semanal">Semanal</option>
@@ -47,24 +41,15 @@
             <option value="anual">Anual</option>
           </select>
         </div>
-        <div class="form-group" id="filtro-fecha-div">
-          <label>Mes</label>
-          <input type="month" id="filtro-mes"/>
-        </div>
-        <div class="form-group" id="filtro-anio-div" style="display:none">
-          <label>A&ntilde;o</label>
-          <input type="number" id="filtro-anio" value="2026" min="2024" max="2030"/>
-        </div>
-        <div class="form-group align-end">
-          <button class="btn-primary" onclick="generarReporte()" data-i18n="generar">Generar</button>
-        </div>
+        <div class="form-group" id="filtro-fecha-div"><label>Mes</label><input type="month" id="filtro-mes"/></div>
+        <div class="form-group" id="filtro-anio-div" style="display:none"><label>A&ntilde;o</label><input type="number" id="filtro-anio" value="2026"/></div>
+        <div class="form-group align-end"><button class="btn-primary" onclick="generarReporte()" style="width:auto;padding:10px 24px">Generar</button></div>
       </div>
     </section>
-
     <section class="section-box" id="reporte-resultado" style="display:none">
       <div class="section-header">
         <h3 id="reporte-titulo">Reporte</h3>
-        <button class="btn-sm" onclick="exportarCSV()" data-i18n="exportar_csv">Exportar CSV</button>
+        <button class="btn-sm" onclick="exportarCSV()">&#128229; Exportar CSV</button>
       </div>
       <div class="cards-grid mini">
         <div class="card card-green"><div class="card-icon">&#128176;</div><div class="card-info"><span>Ingresos</span><strong id="rep-ingresos">$0.00</strong></div></div>
@@ -72,22 +57,12 @@
         <div class="card card-navy"><div class="card-icon">&#9878;&#65039;</div><div class="card-info"><span>Saldo</span><strong id="rep-saldo">$0.00</strong></div></div>
       </div>
       <table class="data-table">
-        <thead>
-          <tr>
-            <th data-i18n="col_fecha">Fecha</th>
-            <th data-i18n="col_concepto">Concepto</th>
-            <th data-i18n="col_tipo">Tipo</th>
-            <th data-i18n="col_valor">Valor</th>
-            <th data-i18n="moneda">Moneda</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Valor</th><th>Moneda</th></tr></thead>
         <tbody id="reporte-body"></tbody>
       </table>
     </section>
-
     <footer class="app-footer">Focus Bank International &mdash; R.I.E. Smart Finance MVP 1.0</footer>
   </main>
-
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script src="js/reportes.js"></script>

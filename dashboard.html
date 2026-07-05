@@ -3,29 +3,26 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R.I.E. Smart Finance &ndash; Dashboard</title>
+  <title>R.I.E. Smart Finance – Dashboard</title>
   <link rel="stylesheet" href="css/style.css"/>
 </head>
 <body class="app-page">
-
   <nav class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo small">FBI</div>
-      <span>R.I.E.</span>
-    </div>
+    <div class="sidebar-brand"><div class="brand-logo small">RIE</div><span>R.I.E.</span></div>
     <ul class="nav-links">
-      <li class="active"><a href="dashboard.html">&#128202; <span data-i18n="nav_dashboard">Dashboard</span></a></li>
-      <li><a href="libro_diario.html">&#128218; <span data-i18n="nav_diario">Libro Diario</span></a></li>
-      <li><a href="reportes.html">&#128196; <span data-i18n="nav_reportes">Reportes</span></a></li>
+      <li class="active"><a href="dashboard.html">&#128202; Dashboard</a></li>
+      <li><a href="libro_diario.html">&#128218; Libro Diario</a></li>
+      <li><a href="prestamos.html">&#127974; Pr&eacute;stamos</a></li>
+      <li><a href="cobros.html">&#128179; Cobros</a></li>
+      <li><a href="reportes.html">&#128196; Reportes</a></li>
     </ul>
     <div class="sidebar-footer">
-      <button onclick="logout()" class="btn-logout" data-i18n="logout">Cerrar Sesi&oacute;n</button>
+      <button onclick="logout()" class="btn-logout">Cerrar Sesi&oacute;n</button>
     </div>
   </nav>
-
   <main class="main-content">
     <header class="top-bar">
-      <h2 data-i18n="dashboard_title">Dashboard</h2>
+      <h2>&#128202; Dashboard</h2>
       <div class="top-bar-right">
         <div class="lang-bar small">
           <button class="lang-btn active" onclick="setLang('es')">ES</button>
@@ -35,75 +32,26 @@
         <span class="user-name" id="user-display">Usuario</span>
       </div>
     </header>
-
     <section class="cards-grid">
-      <div class="card card-green">
-        <div class="card-icon">&#128176;</div>
-        <div class="card-info">
-          <span data-i18n="ingresos_hoy">Ingresos Hoy</span>
-          <strong id="ingresos-hoy">$0.00</strong>
-        </div>
-      </div>
-      <div class="card card-red">
-        <div class="card-icon">&#128184;</div>
-        <div class="card-info">
-          <span data-i18n="gastos_hoy">Gastos Hoy</span>
-          <strong id="gastos-hoy">$0.00</strong>
-        </div>
-      </div>
-      <div class="card card-blue">
-        <div class="card-icon">&#9878;&#65039;</div>
-        <div class="card-info">
-          <span data-i18n="saldo_hoy">Saldo Hoy</span>
-          <strong id="saldo-hoy">$0.00</strong>
-        </div>
-      </div>
-      <div class="card card-green-light">
-        <div class="card-icon">&#128200;</div>
-        <div class="card-info">
-          <span data-i18n="ingresos_mes">Ingresos del Mes</span>
-          <strong id="ingresos-mes">$0.00</strong>
-        </div>
-      </div>
-      <div class="card card-red-light">
-        <div class="card-icon">&#128201;</div>
-        <div class="card-info">
-          <span data-i18n="gastos_mes">Gastos del Mes</span>
-          <strong id="gastos-mes">$0.00</strong>
-        </div>
-      </div>
-      <div class="card card-navy">
-        <div class="card-icon">&#127974;</div>
-        <div class="card-info">
-          <span data-i18n="saldo_mes">Saldo del Mes</span>
-          <strong id="saldo-mes">$0.00</strong>
-        </div>
-      </div>
+      <div class="card card-green"><div class="card-icon">&#128176;</div><div class="card-info"><span>Ingresos Hoy</span><strong id="ingresos-hoy">$0.00</strong></div></div>
+      <div class="card card-red"><div class="card-icon">&#128184;</div><div class="card-info"><span>Gastos Hoy</span><strong id="gastos-hoy">$0.00</strong></div></div>
+      <div class="card card-blue"><div class="card-icon">&#9878;&#65039;</div><div class="card-info"><span>Saldo Hoy</span><strong id="saldo-hoy">$0.00</strong></div></div>
+      <div class="card card-green-light"><div class="card-icon">&#128200;</div><div class="card-info"><span>Ingresos del Mes</span><strong id="ingresos-mes">$0.00</strong></div></div>
+      <div class="card card-red-light"><div class="card-icon">&#128201;</div><div class="card-info"><span>Gastos del Mes</span><strong id="gastos-mes">$0.00</strong></div></div>
+      <div class="card card-navy"><div class="card-icon">&#127974;</div><div class="card-info"><span>Saldo del Mes</span><strong id="saldo-mes">$0.00</strong></div></div>
     </section>
-
     <section class="section-box">
       <div class="section-header">
-        <h3 data-i18n="ultimos_movimientos">&Uacute;ltimos Movimientos</h3>
-        <a href="libro_diario.html" class="btn-sm" data-i18n="ver_todos">Ver todos</a>
+        <h3>&#128203; &Uacute;ltimos Movimientos</h3>
+        <a href="libro_diario.html" class="btn-sm">Ver todos</a>
       </div>
       <table class="data-table">
-        <thead>
-          <tr>
-            <th data-i18n="col_fecha">Fecha</th>
-            <th data-i18n="col_concepto">Concepto</th>
-            <th data-i18n="col_tipo">Tipo</th>
-            <th data-i18n="col_valor">Valor</th>
-          </tr>
-        </thead>
-        <tbody id="movimientos-body">
-          <tr><td colspan="4" class="empty-row" data-i18n="sin_movimientos">Sin movimientos registrados</td></tr>
-        </tbody>
+        <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Valor</th></tr></thead>
+        <tbody id="movimientos-body"><tr><td colspan="4" class="empty-row">Sin movimientos registrados</td></tr></tbody>
       </table>
     </section>
-
-    <footer class="app-footer">Focus Bank International &mdash; R.I.E. Smart Finance MVP 1.0</footer>
+    <footer class="app-footer">Focus Bank International &mdash; R.I.E. Smart Finance &mdash; "Transformando Capital en Prosperidad Global"</footer>
   </main>
-
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script src="js/dashboard.js"></script>
