@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>R.I.E. Smart Finance – Dashboard</title>
   <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="app-page">
   <nav class="sidebar">
@@ -16,20 +17,13 @@
       <li><a href="cobros.html">&#128179; Cobros</a></li>
       <li><a href="reportes.html">&#128196; Reportes</a></li>
     </ul>
-    <div class="sidebar-footer">
-      <button onclick="logout()" class="btn-logout">Cerrar Sesi&oacute;n</button>
-    </div>
+    <div class="sidebar-footer"><button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesi&oacute;n</button></div>
   </nav>
   <main class="main-content">
     <header class="top-bar">
       <h2>&#128202; Dashboard</h2>
       <div class="top-bar-right">
-        <div class="lang-bar small">
-          <button class="lang-btn active" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" onclick="setLang('zh')">&#20013;&#25991;</button>
-        </div>
-        <span class="user-name" id="user-display">Usuario</span>
+        <span class="user-name" id="user-display">Cargando...</span>
       </div>
     </header>
     <section class="cards-grid">
@@ -41,19 +35,48 @@
       <div class="card card-navy"><div class="card-icon">&#127974;</div><div class="card-info"><span>Saldo del Mes</span><strong id="saldo-mes">$0.00</strong></div></div>
     </section>
     <section class="section-box">
-      <div class="section-header">
-        <h3>&#128203; &Uacute;ltimos Movimientos</h3>
-        <a href="libro_diario.html" class="btn-sm">Ver todos</a>
-      </div>
+      <div class="section-header"><h3>&#128203; &Uacute;ltimos Movimientos</h3><a href="libro_diario.html" class="btn-sm">Ver todos</a></div>
       <table class="data-table">
         <thead><tr><th>Fecha</th><th>Concepto</th><th>Tipo</th><th>Valor</th></tr></thead>
-        <tbody id="movimientos-body"><tr><td colspan="4" class="empty-row">Sin movimientos registrados</td></tr></tbody>
+        <tbody id="movimientos-body"><tr><td colspan="4" class="empty-row">Cargando...</td></tr></tbody>
       </table>
     </section>
     <footer class="app-footer">Focus Bank International &mdash; R.I.E. Smart Finance &mdash; "Transformando Capital en Prosperidad Global"</footer>
   </main>
-  <script src="js/i18n.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/dashboard.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    (async()=>{
+      const sesion = await obtenerSesion();
+      if (!sesion) { window.location.href='index.html'; return; }
+      const usuario = await obtenerUsuario();
+      if (usuario) document.getElementById('user-display').textContent = usuario.nombres + ' ' + usuario.apellidos;
+      const mon = usuario?.moneda || 'USD';
+      const movs = await obtenerMovimientos();
+      const today = new Date().toISOString().split('T')[0];
+      const [curY, curM] = today.split('-');
+      let ingHoy=0,gasHoy=0,ingMes=0,gasMes=0;
+      movs.forEach(m=>{
+        const v=parseFloat(m.valor);
+        const [y,mo]=m.fecha.split('-');
+        if(m.fecha===today){if(m.tipo==='ingreso')ingHoy+=v;else gasHoy+=v;}
+        if(y===curY&&mo===curM){if(m.tipo==='ingreso')ingMes+=v;else gasMes+=v;}
+      });
+      document.getElementById('ingresos-hoy').textContent=fmtMoney(ingHoy,mon);
+      document.getElementById('gastos-hoy').textContent=fmtMoney(gasHoy,mon);
+      document.getElementById('saldo-hoy').textContent=fmtMoney(ingHoy-gasHoy,mon);
+      document.getElementById('ingresos-mes').textContent=fmtMoney(ingMes,mon);
+      document.getElementById('gastos-mes').textContent=fmtMoney(gasMes,mon);
+      document.getElementById('saldo-mes').textContent=fmtMoney(ingMes-gasMes,mon);
+      const tbody=document.getElementById('movimientos-body');
+      const last5=movs.slice(0,5);
+      if(!last5.length){tbody.innerHTML='<tr><td colspan="4" class="empty-row">Sin movimientos registrados</td></tr>';return;}
+      tbody.innerHTML='';
+      last5.forEach(m=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${fmtDate(m.fecha)}</td><td>${m.concepto}</td><td><span class="badge badge-${m.tipo}">${m.tipo}</span></td><td><strong>${fmtMoney(m.valor,m.moneda)}</strong></td>`;
+        tbody.appendChild(tr);
+      });
+    })();
+  </script>
 </body>
 </html>
