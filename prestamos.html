@@ -3,189 +3,189 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R.I.E. Smart Finance – Préstamos</title>
+  <title>R.I.E. Smart Finance - Préstamos</title>
   <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/prestamos.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="app-page">
   <nav class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logo small">FBI</div>
-      <span>R.I.E.</span>
-    </div>
+    <div class="sidebar-brand"><div class="brand-logo small">RIE</div><span>R.I.E.</span></div>
     <ul class="nav-links">
-      <li><a href="dashboard.html">📊 <span>Dashboard</span></a></li>
-      <li><a href="libro_diario.html">📒 <span>Libro Diario</span></a></li>
-      <li class="active"><a href="prestamos.html">🏦 <span>Préstamos</span></a></li>
-      <li><a href="cobros.html">💳 <span>Cobros</span></a></li>
-      <li><a href="reportes.html">📄 <span>Reportes</span></a></li>
+      <li><a href="dashboard.html">&#128202; <span data-i18n="nav_dashboard">Dashboard</span></a></li>
+      <li><a href="libro_diario.html">&#128218; <span data-i18n="nav_diario">Libro Diario</span></a></li>
+      <li class="active"><a href="prestamos.html">&#127974; <span data-i18n="nav_prestamos">Pr&eacute;stamos</span></a></li>
+      <li><a href="cobros.html">&#128179; <span data-i18n="nav_cobros">Cobros</span></a></li>
+      <li><a href="reportes.html">&#128196; <span data-i18n="nav_reportes">Reportes</span></a></li>
     </ul>
-    <div class="sidebar-footer">
-      <button onclick="logout()" class="btn-logout">Cerrar Sesión</button>
-    </div>
+    <div class="sidebar-footer"><button onclick="cerrarSesion()" class="btn-logout" data-i18n="logout">Cerrar Sesi&oacute;n</button></div>
   </nav>
-
   <main class="main-content">
     <header class="top-bar">
-      <h2>🏦 Módulo de Préstamos</h2>
+      <h2 data-i18n="nav_prestamos">Pr&eacute;stamos</h2>
       <div class="top-bar-right">
         <div class="lang-bar small">
-          <button class="lang-btn active" onclick="setLang('es')">ES</button>
+          <button class="lang-btn" onclick="setLang('es')">ES</button>
           <button class="lang-btn" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" onclick="setLang('zh')">中文</button>
+          <button class="lang-btn" onclick="setLang('zh')">&#20013;&#25991;</button>
         </div>
-        <span class="user-name" id="user-display">Usuario</span>
+        <span class="user-name" id="user-display">...</span>
       </div>
     </header>
 
-    <!-- RESUMEN CARTERA -->
+    <!-- ESTADISTICAS -->
     <section class="cards-grid">
-      <div class="card card-navy">
-        <div class="card-icon">📋</div>
-        <div class="card-info"><span>Total Préstamos</span><strong id="stat-total">0</strong></div>
-      </div>
-      <div class="card card-green">
-        <div class="card-icon">✅</div>
-        <div class="card-info"><span>Activos</span><strong id="stat-activos">0</strong></div>
-      </div>
-      <div class="card card-red">
-        <div class="card-icon">⚠️</div>
-        <div class="card-info"><span>En Mora</span><strong id="stat-mora">0</strong></div>
-      </div>
-      <div class="card card-blue">
-        <div class="card-icon">💰</div>
-        <div class="card-info"><span>Capital Total</span><strong id="stat-capital">$0.00</strong></div>
-      </div>
-      <div class="card card-green-light">
-        <div class="card-icon">📈</div>
-        <div class="card-info"><span>Por Cobrar</span><strong id="stat-por-cobrar">$0.00</strong></div>
-      </div>
-      <div class="card card-red-light">
-        <div class="card-icon">🔒</div>
-        <div class="card-info"><span>Cancelados</span><strong id="stat-cancelados">0</strong></div>
-      </div>
+      <div class="card card-navy"><div class="card-icon">&#128203;</div><div class="card-info"><span>Total</span><strong id="stat-total">0</strong></div></div>
+      <div class="card card-green"><div class="card-icon">&#10003;</div><div class="card-info"><span>Activos</span><strong id="stat-activos">0</strong></div></div>
+      <div class="card card-red"><div class="card-icon">&#9888;</div><div class="card-info"><span>En Mora</span><strong id="stat-mora">0</strong></div></div>
+      <div class="card card-blue"><div class="card-icon">&#128176;</div><div class="card-info"><span>Por Cobrar</span><strong id="stat-cobrar">$0.00</strong></div></div>
     </section>
 
-    <!-- FORMULARIO NUEVO PRÉSTAMO -->
+    <!-- FORMULARIO -->
     <section class="section-box">
       <div class="section-header">
-        <h3>➕ Nuevo Préstamo</h3>
-        <button class="btn-sm" onclick="toggleForm('form-prestamo')">Mostrar / Ocultar</button>
+        <h3 data-i18n="nuevo_prestamo">Nuevo Pr&eacute;stamo</h3>
+        <button class="btn-sm" onclick="toggleForm('form-prest')">Mostrar/Ocultar</button>
       </div>
-      <div id="form-prestamo">
-        <form onsubmit="crearPrestamo(event)">
+      <div id="form-prest" style="display:none">
+        <form onsubmit="handleCrearPrestamo(event)">
           <div class="form-row">
-            <div class="form-group">
-              <label>Beneficiario (Deudor)</label>
-              <input type="text" id="p-beneficiario" required placeholder="Nombre completo del deudor"/>
-            </div>
-            <div class="form-group">
-              <label>Moneda</label>
-              <select id="p-moneda">
-                <option value="USD">USD — Dólar</option>
-                <option value="EUR">EUR — Euro</option>
-                <option value="GBP">GBP — Libra</option>
-                <option value="CNY">CNY — Yuan</option>
-              </select>
+            <div class="form-group"><label data-i18n="beneficiario">Beneficiario</label><input type="text" id="p-ben" required/></div>
+            <div class="form-group"><label>Moneda</label>
+              <select id="p-mon"><option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option><option value="CNY">CNY</option></select>
             </div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Monto del Préstamo</label>
-              <input type="number" id="p-monto" min="1" step="0.01" required placeholder="1000.00"/>
-            </div>
-            <div class="form-group">
-              <label>Tasa de Interés Anual (%)</label>
-              <input type="number" id="p-tasa" min="0" step="0.01" required placeholder="12.00"/>
-            </div>
-            <div class="form-group">
-              <label>Plazo (meses)</label>
-              <input type="number" id="p-plazo" min="1" max="360" required placeholder="12"/>
-            </div>
+            <div class="form-group"><label data-i18n="monto">Monto</label><input type="number" id="p-monto" min="1" step="0.01" required/></div>
+            <div class="form-group"><label data-i18n="tasa">Tasa Anual (%)</label><input type="number" id="p-tasa" min="0" step="0.01" required/></div>
+            <div class="form-group"><label data-i18n="plazo">Plazo (meses)</label><input type="number" id="p-plazo" min="1" max="360" required/></div>
           </div>
           <div class="form-row">
-            <div class="form-group">
-              <label>Fecha de Inicio</label>
-              <input type="date" id="p-fecha"/>
+            <div class="form-group"><label>Fecha Inicio</label><input type="date" id="p-fecha"/></div>
+            <div class="form-group"><label data-i18n="sistema_amort">Sistema</label>
+              <select id="p-sistema"><option value="frances">Franc&eacute;s (cuota fija)</option><option value="aleman">Alem&aacute;n (capital fijo)</option></select>
             </div>
-            <div class="form-group">
-              <label>Sistema de Amortización</label>
-              <select id="p-sistema">
-                <option value="frances">Francés (cuota fija)</option>
-                <option value="aleman">Alemán (capital fijo)</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Tasa de Mora Mensual (%)</label>
-              <input type="number" id="p-mora" min="0" step="0.01" value="1.5" placeholder="1.5"/>
-            </div>
+            <div class="form-group"><label>Mora Mensual (%)</label><input type="number" id="p-mora" value="1.5" step="0.01"/></div>
           </div>
-          <div class="form-group">
-            <label>Observaciones</label>
-            <input type="text" id="p-obs" placeholder="Opcional — garantía, propósito, etc."/>
-          </div>
-
-          <!-- PREVIEW TABLA AMORTIZACIÓN -->
+          <div class="form-group"><label>Observaciones</label><input type="text" id="p-obs"/></div>
           <div id="preview-box" style="display:none" class="preview-table">
-            <h4>Vista previa — Tabla de Amortización</h4>
+            <h4>Vista Previa — Tabla de Amortizaci&oacute;n</h4>
             <div class="preview-stats">
               <span>Cuota: <strong id="prev-cuota">—</strong></span>
-              <span>Total a pagar: <strong id="prev-total">—</strong></span>
-              <span>Total intereses: <strong id="prev-intereses">—</strong></span>
+              <span>Total: <strong id="prev-total">—</strong></span>
+              <span>Intereses: <strong id="prev-int">—</strong></span>
             </div>
-            <div class="table-scroll">
-              <table class="data-table" id="tabla-preview"></table>
-            </div>
+            <div class="table-scroll"><table class="data-table" id="tabla-preview"></table></div>
           </div>
-
           <div id="prest-error" class="alert alert-error" style="display:none"></div>
+          <div id="prest-ok" class="alert alert-ok" style="display:none"></div>
           <div class="form-row" style="gap:12px;margin-top:8px">
-            <button type="button" class="btn-secondary" onclick="previewAmortizacion()">👁 Vista Previa</button>
-            <button type="submit" class="btn-primary" style="flex:2">💾 Registrar Préstamo</button>
+            <button type="button" class="btn-secondary" onclick="previewAmort()" data-i18n="vista_previa">Vista Previa</button>
+            <button type="submit" class="btn-primary" style="flex:2" data-i18n="registrar_prestamo">Registrar Pr&eacute;stamo</button>
           </div>
         </form>
       </div>
     </section>
 
-    <!-- LISTA DE PRÉSTAMOS -->
+    <!-- LISTA -->
     <section class="section-box">
-      <div class="section-header">
-        <h3>📋 Mis Préstamos</h3>
-        <div style="display:flex;gap:8px">
-          <select id="filtro-estado" onchange="renderPrestamos()" class="select-sm">
-            <option value="todos">Todos</option>
-            <option value="activo">Activos</option>
-            <option value="mora">En Mora</option>
-            <option value="cancelado">Cancelados</option>
-          </select>
-        </div>
-      </div>
+      <div class="section-header"><h3 data-i18n="mis_prestamos">Mis Pr&eacute;stamos</h3></div>
       <div class="table-scroll">
         <table class="data-table">
-          <thead>
-            <tr>
-              <th>Beneficiario</th>
-              <th>Monto</th>
-              <th>Tasa</th>
-              <th>Plazo</th>
-              <th>Sistema</th>
-              <th>Fecha Inicio</th>
-              <th>Estado</th>
-              <th>Por Cobrar</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="tabla-prestamos-body">
-            <tr><td colspan="9" class="empty-row">Sin préstamos registrados</td></tr>
-          </tbody>
+          <thead><tr><th>Beneficiario</th><th>Monto</th><th>Tasa</th><th>Plazo</th><th>Sistema</th><th>Estado</th><th>Por Cobrar</th><th>Acciones</th></tr></thead>
+          <tbody id="tabla-prest"><tr><td colspan="8" class="empty-row">Cargando...</td></tr></tbody>
         </table>
       </div>
     </section>
-
-    <footer class="app-footer">Focus Bank International — R.I.E. Smart Finance MVP 1.0 | Módulo Préstamos</footer>
+    <footer class="app-footer">Focus Bank International &mdash; R.I.E. Smart Finance</footer>
   </main>
-
   <script src="js/i18n.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/prestamos.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script>
+    let usuarioActual = null;
+    let todosPrestamos = [];
+
+    (async()=>{
+      usuarioActual = await requireAuth();
+      if (!usuarioActual) return;
+      document.getElementById('p-fecha').value = new Date().toISOString().split('T')[0];
+      document.getElementById('p-mon').value = usuarioActual.moneda || 'USD';
+      await renderPrestamos();
+    })();
+
+    function previewAmort() {
+      const monto = parseFloat(document.getElementById('p-monto').value);
+      const tasa  = parseFloat(document.getElementById('p-tasa').value);
+      const plazo = parseInt(document.getElementById('p-plazo').value);
+      const fecha = document.getElementById('p-fecha').value;
+      const sist  = document.getElementById('p-sistema').value;
+      const mon   = document.getElementById('p-mon').value;
+      const err   = document.getElementById('prest-error');
+      err.style.display = 'none';
+      if (!monto || !plazo || isNaN(tasa) || !fecha) { err.textContent='Complete monto, tasa, plazo y fecha.'; err.style.display='block'; return; }
+      const tabla = sist==='frances' ? amortizacionFrances(monto,tasa,plazo,fecha) : amortizacionAleman(monto,tasa,plazo,fecha);
+      const totalPagar = tabla.reduce((s,r)=>s+r.cuota_total,0);
+      const totalInt   = tabla.reduce((s,r)=>s+r.interes,0);
+      document.getElementById('prev-cuota').textContent = sist==='frances' ? fmtMoney(tabla[0].cuota_total,mon) : 'Variable';
+      document.getElementById('prev-total').textContent = fmtMoney(totalPagar,mon);
+      document.getElementById('prev-int').textContent   = fmtMoney(totalInt,mon);
+      const tbl = document.getElementById('tabla-preview');
+      tbl.innerHTML = `<thead><tr><th>#</th><th>Vencimiento</th><th>Capital</th><th>Inter&eacute;s</th><th>Cuota</th><th>Saldo</th></tr></thead><tbody>${
+        tabla.slice(0,24).map(r=>`<tr><td>${r.numero_cuota}</td><td>${fmtDate(r.fecha_vencimiento)}</td><td>${fmtMoney(r.capital,mon)}</td><td>${fmtMoney(r.interes,mon)}</td><td><strong>${fmtMoney(r.cuota_total,mon)}</strong></td><td>${fmtMoney(r.saldo_restante,mon)}</td></tr>`).join('')
+      }${tabla.length>24?`<tr><td colspan="6" class="empty-row">... y ${tabla.length-24} cuotas más</td></tr>`:''}</tbody>`;
+      document.getElementById('preview-box').style.display = '';
+    }
+
+    async function handleCrearPrestamo(e) {
+      e.preventDefault();
+      const err = document.getElementById('prest-error');
+      const ok  = document.getElementById('prest-ok');
+      err.style.display='none'; ok.style.display='none';
+      const monto = parseFloat(document.getElementById('p-monto').value);
+      const tasa  = parseFloat(document.getElementById('p-tasa').value);
+      const plazo = parseInt(document.getElementById('p-plazo').value);
+      const fecha = document.getElementById('p-fecha').value;
+      const sist  = document.getElementById('p-sistema').value;
+      const mon   = document.getElementById('p-mon').value;
+      const mora  = parseFloat(document.getElementById('p-mora').value)||1.5;
+      const ben   = document.getElementById('p-ben').value.trim();
+      const obs   = document.getElementById('p-obs').value.trim();
+      if (!ben||!monto||!plazo||!fecha) { err.textContent='Complete todos los campos.'; err.style.display='block'; return; }
+      const tabla = sist==='frances' ? amortizacionFrances(monto,tasa,plazo,fecha) : amortizacionAleman(monto,tasa,plazo,fecha);
+      try {
+        await crearPrestamo({ beneficiario:ben, monto, tasa_anual:tasa, plazo_meses:plazo, sistema_amort:sist, moneda:mon, tasa_mora:mora, fecha_inicio:fecha, estado:'activo', observaciones:obs }, tabla);
+        ok.textContent = `✅ Préstamo registrado. ${plazo} cuotas generadas para ${ben}.`;
+        ok.style.display='block';
+        document.getElementById('p-ben').value=''; document.getElementById('p-monto').value='';
+        document.getElementById('p-tasa').value=''; document.getElementById('p-plazo').value='';
+        document.getElementById('preview-box').style.display='none';
+        await renderPrestamos();
+      } catch(ex) { err.textContent='Error: '+ex.message; err.style.display='block'; }
+    }
+
+    async function renderPrestamos() {
+      const tbody = document.getElementById('tabla-prest');
+      tbody.innerHTML = '<tr><td colspan="8" class="empty-row">Cargando...</td></tr>';
+      todosPrestamos = await obtenerPrestamos();
+      const mon = usuarioActual?.moneda||'USD';
+      let activos=0, mora=0, porCobrar=0;
+      if (!todosPrestamos.length) { tbody.innerHTML='<tr><td colspan="8" class="empty-row">Sin préstamos registrados</td></tr>'; return; }
+      tbody.innerHTML='';
+      for (const p of todosPrestamos) {
+        const cuotas = await obtenerCuotas(p.id);
+        const pend = cuotas.filter(c=>!c.pagada).reduce((s,c)=>s+c.cuota_total,0);
+        porCobrar += pend;
+        if (p.estado==='activo') activos++;
+        if (p.estado==='mora') mora++;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><strong>${p.beneficiario}</strong></td><td>${fmtMoney(p.monto,p.moneda)}</td><td>${p.tasa_anual}%</td><td>${p.plazo_meses}m</td><td>${p.sistema_amort}</td><td><span class="badge badge-${p.estado}">${p.estado.toUpperCase()}</span></td><td><strong>${fmtMoney(pend,p.moneda)}</strong></td><td><a href="cobros.html?p=${p.id}" class="btn-ver">Ver Cuotas</a></td>`;
+        tbody.appendChild(tr);
+      }
+      document.getElementById('stat-total').textContent = todosPrestamos.length;
+      document.getElementById('stat-activos').textContent = activos;
+      document.getElementById('stat-mora').textContent = mora;
+      document.getElementById('stat-cobrar').textContent = fmtMoney(porCobrar, mon);
+    }
+  </script>
 </body>
 </html>
