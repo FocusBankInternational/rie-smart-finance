@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>R.I.E. Smart Finance – Login</title>
+  <title>R.I.E. Smart Finance</title>
   <link rel="stylesheet" href="css/style.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -15,81 +15,182 @@
       <p class="brand-sub">Riqueza &bull; Inteligencia &bull; Energ&iacute;a</p>
       <p class="brand-sub2">Focus Bank International</p>
     </div>
+
     <div class="lang-bar">
-      <button class="lang-btn active" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" onclick="setLang('es')">ES</button>
       <button class="lang-btn" onclick="setLang('en')">EN</button>
       <button class="lang-btn" onclick="setLang('zh')">&#20013;&#25991;</button>
     </div>
+
     <form onsubmit="handleLogin(event)">
       <div class="form-group">
-        <label>Correo electr&oacute;nico</label>
+        <label id="lbl-email">Correo electr&oacute;nico</label>
         <input type="email" id="correo" required placeholder="usuario@email.com"/>
       </div>
       <div class="form-group">
-        <label>Contrase&ntilde;a</label>
+        <label id="lbl-password">Contrase&ntilde;a</label>
         <input type="password" id="password" required placeholder="••••••••"/>
       </div>
       <div id="login-error" class="alert alert-error" style="display:none"></div>
       <button type="submit" class="btn-primary" id="btn-login">Iniciar Sesi&oacute;n</button>
     </form>
+
     <p class="auth-link" style="margin-top:12px">
-      <a href="#" onclick="mostrarRecuperar()" style="color:#888;font-size:12px">&iquest;Olvidaste tu contrase&ntilde;a?</a>
+      <a href="#" onclick="mostrarRecuperar()" id="lnk-forgot" style="color:#888;font-size:12px">
+        &iquest;Olvidaste tu contrase&ntilde;a?
+      </a>
     </p>
+
     <div id="recuperar-box" style="display:none;margin-top:12px">
       <div class="form-group">
-        <label>Ingresa tu correo para recuperar:</label>
+        <label id="lbl-recovery">Ingresa tu correo para recuperar:</label>
         <input type="email" id="correo-recuperar" placeholder="usuario@email.com"/>
       </div>
-      <button class="btn-secondary" style="width:100%;margin-top:4px" onclick="handleRecuperar()">Enviar correo de recuperaci&oacute;n</button>
+      <button class="btn-secondary" style="width:100%;margin-top:4px" onclick="handleRecuperar()" id="btn-recovery">
+        Enviar correo de recuperaci&oacute;n
+      </button>
       <div id="recuperar-ok" class="alert alert-ok" style="display:none;margin-top:8px"></div>
     </div>
-    <p class="auth-link">&iquest;No tienes cuenta? <a href="register.html">Reg&iacute;strate aqu&iacute;</a></p>
+
+    <p class="auth-link">
+      <span id="lbl-no-account">&iquest;No tienes cuenta?</span>
+      <a href="register.html" id="lnk-register">Reg&iacute;strate aqu&iacute;</a>
+    </p>
     <p class="powered">Powered by Focus Bank International</p>
   </div>
-  <script src="js/i18n.js"></script>
+
   <script src="js/supabase-config.js"></script>
   <script>
-    function setLang(l) { localStorage.setItem('rie_lang',l); }
-    function mostrarRecuperar() {
-      const box = document.getElementById('recuperar-box');
-      box.style.display = box.style.display==='none' ? '' : 'none';
+    // ── TRADUCCIONES LOGIN ────────────────────────────────────
+    const LOGIN_TEXTS = {
+      es: {
+        email: "Correo electrónico",
+        password: "Contraseña",
+        btn: "Iniciar Sesión",
+        forgot: "¿Olvidaste tu contraseña?",
+        recovery_label: "Ingresa tu correo para recuperar:",
+        recovery_btn: "Enviar correo de recuperación",
+        no_account: "¿No tienes cuenta?",
+        register: "Regístrate aquí",
+        error_credentials: "Correo o contraseña incorrectos.",
+        sending: "Enviando...",
+        logging: "Iniciando...",
+        sent_ok: "✅ Correo enviado. Revisa tu bandeja de entrada.",
+      },
+      en: {
+        email: "Email address",
+        password: "Password",
+        btn: "Sign In",
+        forgot: "Forgot your password?",
+        recovery_label: "Enter your email to recover:",
+        recovery_btn: "Send recovery email",
+        no_account: "Don't have an account?",
+        register: "Sign up here",
+        error_credentials: "Incorrect email or password.",
+        sending: "Sending...",
+        logging: "Signing in...",
+        sent_ok: "✅ Email sent. Check your inbox.",
+      },
+      zh: {
+        email: "电子邮件",
+        password: "密码",
+        btn: "登录",
+        forgot: "忘记密码？",
+        recovery_label: "输入您的电子邮件以恢复：",
+        recovery_btn: "发送恢复邮件",
+        no_account: "没有账户？",
+        register: "在此注册",
+        error_credentials: "电子邮件或密码不正确。",
+        sending: "发送中...",
+        logging: "登录中...",
+        sent_ok: "✅ 邮件已发送。请检查您的收件箱。",
+      }
+    };
+
+    var currentLang = localStorage.getItem('rie_lang') || 'es';
+
+    function setLang(lang) {
+      currentLang = lang;
+      localStorage.setItem('rie_lang', lang);
+      applyLoginTranslations();
     }
+
+    function applyLoginTranslations() {
+      var tx = LOGIN_TEXTS[currentLang] || LOGIN_TEXTS['es'];
+      document.getElementById('lbl-email').textContent       = tx.email;
+      document.getElementById('lbl-password').textContent    = tx.password;
+      document.getElementById('btn-login').textContent       = tx.btn;
+      document.getElementById('lnk-forgot').textContent      = tx.forgot;
+      document.getElementById('lbl-recovery').textContent    = tx.recovery_label;
+      document.getElementById('btn-recovery').textContent    = tx.recovery_btn;
+      document.getElementById('lbl-no-account').textContent  = tx.no_account;
+      document.getElementById('lnk-register').textContent    = tx.register;
+      // Actualizar botones activos
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        var txt = btn.textContent.trim();
+        var active = (currentLang==='zh' && txt.indexOf('中')>=0) ||
+                     (currentLang==='en' && txt==='EN') ||
+                     (currentLang==='es' && txt==='ES');
+        btn.classList.toggle('active', active);
+      });
+    }
+
+    // Aplicar al cargar
+    applyLoginTranslations();
+
+    // ── FUNCIONES ─────────────────────────────────────────────
+    function mostrarRecuperar() {
+      var box = document.getElementById('recuperar-box');
+      box.style.display = box.style.display === 'none' ? '' : 'none';
+    }
+
     async function handleLogin(e) {
       e.preventDefault();
-      const err = document.getElementById('login-error');
-      const btn = document.getElementById('btn-login');
+      var tx  = LOGIN_TEXTS[currentLang] || LOGIN_TEXTS['es'];
+      var err = document.getElementById('login-error');
+      var btn = document.getElementById('btn-login');
       err.style.display = 'none';
-      btn.textContent = 'Iniciando...';
+      btn.textContent = tx.logging;
       btn.disabled = true;
       try {
-        const correo = document.getElementById('correo').value.trim();
-        const password = document.getElementById('password').value;
+        var correo   = document.getElementById('correo').value.trim();
+        var password = document.getElementById('password').value;
         await iniciarSesion(correo, password);
         window.location.href = 'dashboard.html';
       } catch(ex) {
-        err.textContent = 'Correo o contraseña incorrectos.';
+        var tx2 = LOGIN_TEXTS[currentLang] || LOGIN_TEXTS['es'];
+        err.textContent = tx2.error_credentials;
         err.style.display = 'block';
-        btn.textContent = 'Iniciar Sesión';
+        btn.textContent = tx2.btn;
         btn.disabled = false;
       }
     }
+
     async function handleRecuperar() {
-      const correo = document.getElementById('correo-recuperar').value.trim();
-      const ok = document.getElementById('recuperar-ok');
+      var tx  = LOGIN_TEXTS[currentLang] || LOGIN_TEXTS['es'];
+      var correo = document.getElementById('correo-recuperar').value.trim();
+      var ok = document.getElementById('recuperar-ok');
+      var btn = document.getElementById('btn-recovery');
+      btn.textContent = tx.sending;
+      btn.disabled = true;
       try {
         await recuperarPassword(correo);
-        ok.textContent = '✅ Correo enviado. Revisa tu bandeja de entrada.';
+        ok.textContent = tx.sent_ok;
+        ok.className = 'alert alert-ok';
         ok.style.display = 'block';
       } catch(ex) {
         ok.textContent = '❌ Error: ' + ex.message;
-        ok.style.display = 'block';
         ok.className = 'alert alert-error';
+        ok.style.display = 'block';
       }
+      btn.textContent = tx.recovery_btn;
+      btn.disabled = false;
     }
-    // Si ya hay sesión activa, ir al dashboard
-    (async()=>{
-      const s = await obtenerSesion();
-      if(s) window.location.href = 'dashboard.html';
+
+    // Si ya hay sesión activa ir al dashboard
+    (async function() {
+      var s = await obtenerSesion();
+      if (s) window.location.href = 'dashboard.html';
     })();
   </script>
 </body>
