@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <link rel="icon" type="image/x-icon" href="favicon.ico"/>
+  <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>R.I.E. Smart Finance — Panel Administrador</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/admin.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="app-page">
+  <nav class="sidebar">
+    <div class="sidebar-brand"><div class="brand-logo small">RIE</div><span>Admin</span></div>
+    <ul class="nav-links">
+      <li class="active"><a href="admin.html">&#9965; Panel Admin</a></li>
+      <li><a href="dashboard.html">&#128202; Mi Dashboard</a></li>
+      <li><a href="prestamos.html">&#127974; Pr&eacute;stamos</a></li>
+      <li><a href="cobros.html">&#128179; Cobros</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button onclick="cerrarSesion()" class="btn-logout">Cerrar Sesi&oacute;n</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <h2>&#9965; Panel de Administrador</h2>
+      <div class="top-bar-right">
+        <span class="admin-badge">ADMINISTRADOR</span>
+        <span class="user-name" id="user-display">...</span>
+      </div>
+    </header>
+
+    <!-- ESTADÍSTICAS GLOBALES -->
+    <section class="cards-grid">
+      <div class="card card-navy">
+        <div class="card-icon">&#128101;</div>
+        <div class="card-info"><span>Total Usuarios</span><strong id="stat-usuarios">0</strong></div>
+      </div>
+      <div class="card card-green">
+        <div class="card-icon">&#127974;</div>
+        <div class="card-info"><span>Préstamos Activos</span><strong id="stat-prestamos">0</strong></div>
+      </div>
+      <div class="card card-red">
+        <div class="card-icon">&#9888;</div>
+        <div class="card-info"><span>En Mora</span><strong id="stat-mora">0</strong></div>
+      </div>
+      <div class="card card-blue">
+        <div class="card-icon">&#128176;</div>
+        <div class="card-info"><span>Cartera Total</span><strong id="stat-cartera">$0.00</strong></div>
+      </div>
+      <div class="card card-green-light">
+        <div class="card-icon">&#128200;</div>
+        <div class="card-info"><span>Ingresos Sistema</span><strong id="stat-ingresos">$0.00</strong></div>
+      </div>
+      <div class="card card-red-light">
+        <div class="card-icon">&#128201;</div>
+        <div class="card-info"><span>Gastos Sistema</span><strong id="stat-gastos">$0.00</strong></div>
+      </div>
+    </section>
+
+    <!-- TABS -->
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="showTab('tab-usuarios')">&#128101; Usuarios</button>
+      <button class="tab-btn" onclick="showTab('tab-prestamos')">&#127974; Préstamos</button>
+      <button class="tab-btn" onclick="showTab('tab-movimientos')">&#128218; Movimientos</button>
+      <button class="tab-btn" onclick="showTab('tab-cartera')">&#128196; Cartera</button>
+    </div>
+
+    <!-- TAB: USUARIOS -->
+    <section class="section-box tab-content" id="tab-usuarios">
+      <div class="section-header">
+        <h3>&#128101; Usuarios Registrados</h3>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="buscar-usuario" placeholder="Buscar usuario..." onkeyup="filtrarUsuarios()" class="search-input"/>
+          <button class="btn-sm" onclick="exportarUsuariosCSV()">&#128229; Exportar CSV</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Correo</th>
+              <th>País</th>
+              <th>Moneda</th>
+              <th>Rol</th>
+              <th>Registro</th>
+              <th>Préstamos</th>
+              <th>Por Cobrar</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-usuarios">
+            <tr><td colspan="9" class="empty-row">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: PRÉSTAMOS -->
+    <section class="section-box tab-content" id="tab-prestamos" style="display:none">
+      <div class="section-header">
+        <h3>&#127974; Todos los Préstamos</h3>
+        <div style="display:flex;gap:8px">
+          <select id="filtro-estado-admin" onchange="cargarPrestamosAdmin()" class="select-sm">
+            <option value="todos">Todos</option>
+            <option value="activo">Activos</option>
+            <option value="mora">En Mora</option>
+            <option value="cancelado">Cancelados</option>
+          </select>
+          <button class="btn-sm" onclick="exportarPrestamosCSV()">&#128229; Exportar CSV</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Beneficiario</th>
+              <th>Monto</th>
+              <th>Tasa</th>
+              <th>Plazo</th>
+              <th>Sistema</th>
+              <th>Inicio</th>
+              <th>Estado</th>
+              <th>Por Cobrar</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-prestamos-admin">
+            <tr><td colspan="9" class="empty-row">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: MOVIMIENTOS -->
+    <section class="section-box tab-content" id="tab-movimientos" style="display:none">
+      <div class="section-header">
+        <h3>&#128218; Movimientos del Sistema</h3>
+        <div style="display:flex;gap:8px">
+          <select id="filtro-tipo-admin" onchange="cargarMovimientosAdmin()" class="select-sm">
+            <option value="todos">Todos</option>
+            <option value="ingreso">Ingresos</option>
+            <option value="gasto">Gastos</option>
+          </select>
+          <button class="btn-sm" onclick="exportarMovimientosCSV()">&#128229; Exportar CSV</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Fecha</th>
+              <th>Concepto</th>
+              <th>Tipo</th>
+              <th>Valor</th>
+              <th>Moneda</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-movimientos-admin">
+            <tr><td colspan="6" class="empty-row">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB: CARTERA -->
+    <section class="section-box tab-content" id="tab-cartera" style="display:none">
+      <div class="section-header">
+        <h3>&#128196; Reporte de Cartera Global</h3>
+        <button class="btn-sm" onclick="exportarCarteraCSV()">&#128229; Exportar CSV</button>
+      </div>
+      <div class="cards-grid mini" style="margin:0 0 16px 0">
+        <div class="card card-green"><div class="card-icon">&#10003;</div><div class="card-info"><span>Cuotas Pagadas</span><strong id="cart-pagadas">0</strong></div></div>
+        <div class="card card-red"><div class="card-icon">&#128308;</div><div class="card-info"><span>Cuotas Vencidas</span><strong id="cart-vencidas">0</strong></div></div>
+        <div class="card card-blue"><div class="card-icon">&#128197;</div><div class="card-info"><span>Cuotas Pendientes</span><strong id="cart-pendientes">0</strong></div></div>
+        <div class="card card-navy"><div class="card-icon">&#128181;</div><div class="card-info"><span>Total Mora</span><strong id="cart-mora">$0.00</strong></div></div>
+      </div>
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Beneficiario</th>
+              <th>Cuota #</th>
+              <th>Vencimiento</th>
+              <th>Cuota</th>
+              <th>Estado</th>
+              <th>Mora</th>
+              <th>F. Pago</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-cartera-admin">
+            <tr><td colspan="8" class="empty-row">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      Focus Bank International &mdash; R.I.E. Smart Finance &mdash; Panel Administrador
+    </footer>
+  </main>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
