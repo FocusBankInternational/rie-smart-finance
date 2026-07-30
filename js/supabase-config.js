@@ -1,6 +1,6 @@
 // ================================================================
-// R.I.E. Smart Finance — supabase-config.js CORREGIDO
-// Sesión persistente — no se cierra sola
+// R.I.E. Smart Finance — supabase-config.js
+// Versión corregida — manejo de sesión nula
 // ================================================================
 
 const SUPABASE_URL = 'https://yiaurkpnaqofloukcyfe.supabase.co';
@@ -8,43 +8,46 @@ const SUPABASE_KEY = 'sb_publishable_gOxNRHcb0y8FA2Gcon2nNg_4TUbfDXL';
 
 const { createClient } = supabase;
 
-// Configuración con sesión persistente
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true,
-    storage: localStorage
+    persistSession:      true,
+    autoRefreshToken:    true,
+    detectSessionInUrl:  true,
+    storage:             localStorage
   }
 });
 
 // ── SESIÓN ────────────────────────────────────────────────────
 async function obtenerSesion() {
-  const { data } = await db.auth.getSession();
-  return data.session;
+  try {
+    const { data } = await db.auth.getSession();
+    return data.session || null;
+  } catch(e) { return null; }
+}
+
+async function obtenerUsuarioAuth() {
+  try {
+    const { data: { user } } = await db.auth.getUser();
+    return user || null;
+  } catch(e) { return null; }
 }
 
 async function obtenerUsuario() {
-  const { data: { user } } = await db.auth.getUser();
+  const user = await obtenerUsuarioAuth();
   if (!user) return null;
   try {
     const { data } = await db.from('usuarios').select('*').eq('id', user.id).single();
-    return data || {
-      id: user.id,
-      nombres: user.user_metadata?.nombres || user.email.split('@')[0],
-      apellidos: user.user_metadata?.apellidos || '',
-      moneda: 'USD',
-      idioma: 'es'
-    };
-  } catch(e) {
-    return {
-      id: user.id,
-      nombres: user.email.split('@')[0],
-      apellidos: '',
-      moneda: 'USD',
-      idioma: 'es'
-    };
-  }
+    if (data) return data;
+  } catch(e) {}
+  // Fallback con datos del auth
+  return {
+    id:       user.id,
+    nombres:  user.user_metadata?.nombres || user.email.split('@')[0],
+    apellidos: user.user_metadata?.apellidos || '',
+    moneda:   'USD',
+    idioma:   'es',
+    rol:      'usuario'
+  };
 }
 
 async function cerrarSesion() {
@@ -52,7 +55,6 @@ async function cerrarSesion() {
   window.location.href = 'index.html';
 }
 
-// Verificar sesión — redirige al login si no hay sesión
 async function requireAuth() {
   const session = await obtenerSesion();
   if (!session) {
@@ -60,45 +62,40 @@ async function requireAuth() {
     return null;
   }
   const usuario = await obtenerUsuario();
-  const el = document.getElementById('user-display');
-  if (el && usuario) {
-    el.textContent = (usuario.nombres || '') + ' ' + (usuario.apellidos || '');
+  if (!usuario) {
+    window.location.href = 'index.html';
+    return null;
   }
+  const el = document.getElementById('user-display');
+  if (el) el.textContent = (usuario.nombres||'') + ' ' + (usuario.apellidos||'');
   return usuario;
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
+async function iniciarSesion(correo, password) {
+  const { data, error } = await db.auth.signInWithPassword({ email: correo, password });
+  if (error) throw error;
+  return data;
+}
+
 async function registrarUsuario(datos) {
   const { nombres, apellidos, correo, password, pais, moneda, idioma } = datos;
-  const { data: authData, error: authError } = await db.auth.signUp({
-    email: correo,
-    password: password,
-    options: {
-      data: { nombres, apellidos }
-    }
+  const { data: authData, error } = await db.auth.signUp({
+    email: correo, password,
+    options: { data: { nombres, apellidos } }
   });
-  if (authError) throw authError;
+  if (error) throw error;
   if (authData.user) {
-    const { error: dbError } = await db.from('usuarios').insert([{
+    await db.from('usuarios').insert([{
       id: authData.user.id,
       nombres, apellidos, correo,
       pais: pais || 'EC',
       moneda: moneda || 'USD',
       idioma: idioma || 'es',
       rol: 'usuario'
-    }]);
-    if (dbError) console.warn('Error insertando usuario:', dbError);
+    }]).catch(e => console.warn('Usuario ya existe:', e.message));
   }
   return authData;
-}
-
-async function iniciarSesion(correo, password) {
-  const { data, error } = await db.auth.signInWithPassword({
-    email: correo,
-    password: password
-  });
-  if (error) throw error;
-  return data;
 }
 
 async function recuperarPassword(correo) {
@@ -110,21 +107,19 @@ async function recuperarPassword(correo) {
 
 // ── MOVIMIENTOS ───────────────────────────────────────────────
 async function crearMovimiento(datos) {
-  const { data: { user } } = await db.auth.getUser();
-  const { data, error } = await db
-    .from('libro_diario')
-    .insert([{ ...datos, usuario_id: user.id }])
-    .select();
+  const user = await obtenerUsuarioAuth();
+  if (!user) throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
+  const { data, error } = await db.from('libro_diario')
+    .insert([{ ...datos, usuario_id: user.id }]).select();
   if (error) throw error;
   return data;
 }
 
 async function obtenerMovimientos() {
-  const { data: { user } } = await db.auth.getUser();
-  const { data, error } = await db
-    .from('libro_diario')
-    .select('*')
-    .eq('usuario_id', user.id)
+  const user = await obtenerUsuarioAuth();
+  if (!user) return [];
+  const { data, error } = await db.from('libro_diario')
+    .select('*').eq('usuario_id', user.id)
     .order('fecha', { ascending: false });
   if (error) throw error;
   return data || [];
@@ -137,59 +132,55 @@ async function eliminarMovimiento(id) {
 
 // ── PRÉSTAMOS ─────────────────────────────────────────────────
 async function crearPrestamo(datos, cuotas) {
-  const { data: { user } } = await db.auth.getUser();
-  const { data: prestamo, error } = await db
-    .from('prestamos')
+  const user = await obtenerUsuarioAuth();
+  if (!user) throw new Error('No hay sesión activa. Por favor inicia sesión nuevamente.');
+
+  const { data: prestamo, error } = await db.from('prestamos')
     .insert([{ ...datos, usuario_id: user.id }])
-    .select()
-    .single();
+    .select().single();
   if (error) throw error;
+  if (!prestamo) throw new Error('No se pudo crear el préstamo.');
+
   const cuotasConId = cuotas.map(c => ({ ...c, prestamo_id: prestamo.id }));
   const { error: cError } = await db.from('cuotas').insert(cuotasConId);
   if (cError) throw cError;
+
   return prestamo;
 }
 
 async function obtenerPrestamos() {
-  const { data: { user } } = await db.auth.getUser();
-  const { data, error } = await db
-    .from('prestamos')
-    .select('*')
-    .eq('usuario_id', user.id)
+  const user = await obtenerUsuarioAuth();
+  if (!user) return [];
+  const { data, error } = await db.from('prestamos')
+    .select('*').eq('usuario_id', user.id)
     .order('fecha_creacion', { ascending: false });
   if (error) throw error;
   return data || [];
 }
 
 async function obtenerCuotas(prestamoId) {
-  const { data, error } = await db
-    .from('cuotas')
-    .select('*')
-    .eq('prestamo_id', prestamoId)
+  const { data, error } = await db.from('cuotas')
+    .select('*').eq('prestamo_id', prestamoId)
     .order('numero_cuota', { ascending: true });
   if (error) throw error;
   return data || [];
 }
 
 async function pagarCuota(id, fechaPago, mora) {
-  const { error } = await db
-    .from('cuotas')
-    .update({ pagada: true, fecha_pago: fechaPago, mora })
-    .eq('id', id);
+  const { error } = await db.from('cuotas')
+    .update({ pagada: true, fecha_pago: fechaPago, mora }).eq('id', id);
   if (error) throw error;
 }
 
 async function actualizarEstadoPrestamo(id, estado) {
-  const { error } = await db
-    .from('prestamos')
-    .update({ estado })
-    .eq('id', id);
+  const { error } = await db.from('prestamos').update({ estado }).eq('id', id);
   if (error) throw error;
 }
 
 async function eliminarPrestamo(id) {
   await db.from('cuotas').delete().eq('prestamo_id', id);
-  await db.from('prestamos').delete().eq('id', id);
+  const { error } = await db.from('prestamos').delete().eq('id', id);
+  if (error) throw error;
 }
 
 // ── CÁLCULOS ──────────────────────────────────────────────────
@@ -210,11 +201,11 @@ function amortizacionFrances(monto, tasaAnual, plazo, fechaInicio) {
     const capital = round2(cuota - interes);
     saldo = round2(Math.max(saldo - capital, 0));
     tabla.push({
-      numero_cuota: i,
+      numero_cuota:      i,
       fecha_vencimiento: fecha.toISOString().split('T')[0],
       capital, interes,
-      cuota_total: round2(cuota),
-      saldo_restante: saldo
+      cuota_total:       round2(cuota),
+      saldo_restante:    saldo
     });
   }
   return tabla;
@@ -232,12 +223,12 @@ function amortizacionAleman(monto, tasaAnual, plazo, fechaInicio) {
     const interes = round2(saldo * tm);
     saldo = round2(Math.max(saldo - capitalFijo, 0));
     tabla.push({
-      numero_cuota: i,
+      numero_cuota:      i,
       fecha_vencimiento: fecha.toISOString().split('T')[0],
-      capital: capitalFijo,
+      capital:           capitalFijo,
       interes,
-      cuota_total: round2(capitalFijo + interes),
-      saldo_restante: saldo
+      cuota_total:       round2(capitalFijo + interes),
+      saldo_restante:    saldo
     });
   }
   return tabla;
@@ -260,8 +251,8 @@ function fmtMoney(val, moneda) {
 
 function fmtDate(s) {
   if (!s) return '—';
-  const [y, m, d] = s.split('-');
-  return d + '/' + m + '/' + y;
+  const parts = s.split('T')[0].split('-');
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
 }
 
 function toggleForm(id) {
